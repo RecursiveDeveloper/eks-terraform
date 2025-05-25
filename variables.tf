@@ -11,4 +11,4 @@ variable "vpc_private_subnets" {}
 variable "vpc_public_subnets" {}
 
 variable "eks_cluster_name" {}
-variable "eks-managed_node_groups" {}
+variable "eks_managed_node_groups" {}

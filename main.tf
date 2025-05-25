@@ -1,18 +1,19 @@
 module "vpc" {
   source = "./modules/vpc"
 
-  vpc_name        = var.vpc_name
-  vpc_cidr        = var.vpc_cidr
-  vpc_azs         = var.vpc_azs
+  vpc_name            = var.vpc_name
+  vpc_cidr            = var.vpc_cidr
+  vpc_azs             = var.vpc_azs
   vpc_private_subnets = var.vpc_private_subnets
   vpc_public_subnets  = var.vpc_public_subnets
 }
 
-# module "eks" {
-#   source = "./modules/eks"
+module "eks" {
+  source = "./modules/eks"
 
-#   vpc_id          = module.vpc.vpc_id
-#   vpc_subnet_ids  = module.vpc.vpc_private_subnets
-#   eks_cluster_name = var.eks_cluster_name
-#   eks-managed_node_groups = var.eks-managed_node_groups
-# }
+  vpc_id                  = module.vpc.vpc_id
+  vpc_private_subnets     = module.vpc.vpc_private_subnet_ids
+  vpc_public_subnets      = module.vpc.vpc_public_subnet_ids
+  eks_cluster_name        = var.eks_cluster_name
+  eks_managed_node_groups = var.eks_managed_node_groups
+}
