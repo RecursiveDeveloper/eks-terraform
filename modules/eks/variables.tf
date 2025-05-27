@@ -8,11 +8,6 @@ variable "vpc_private_subnets" {
   type        = list(string)
 }
 
-variable "vpc_public_subnets" {
-  description = "List of public subnet IDs for the EKS cluster"
-  type        = list(string)
-}
-
 variable "eks_cluster_name" {
   description = "The name of the EKS cluster"
   type        = string

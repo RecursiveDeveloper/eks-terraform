@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "5.98.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+}
+
 module "vpc" {
   source = "./modules/vpc"
 
@@ -13,7 +26,6 @@ module "eks" {
 
   vpc_id                  = module.vpc.vpc_id
   vpc_private_subnets     = module.vpc.vpc_private_subnet_ids
-  vpc_public_subnets      = module.vpc.vpc_public_subnet_ids
   eks_cluster_name        = var.eks_cluster_name
   eks_managed_node_groups = var.eks_managed_node_groups
 }
