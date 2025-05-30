@@ -43,7 +43,7 @@ resource "aws_iam_user_group_membership" "aws_iam_user1_add_to_devops_group" {
   user = aws_iam_user.devops-user1.name
 
   groups = [
-    aws_iam_group.devops.name,
+    aws_iam_group.devops_group.name,
   ]
 }
 
@@ -51,6 +51,6 @@ resource "aws_iam_user_group_membership" "aws_iam_user2_add_to_devops_group" {
   user = aws_iam_user.devops-user2.name
 
   groups = [
-    aws_iam_group.devops.name,
+    aws_iam_group.devops_group.name,
   ]
 }
