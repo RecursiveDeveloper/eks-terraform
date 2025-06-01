@@ -1,3 +1,8 @@
+variable "iam_devops_role_arn" {
+  description = "ARN of the IAM DevOps role"
+  type        = string
+}
+
 variable "vpc_id" {
   description = "The VPC ID where the EKS cluster will be created"
   type        = string
@@ -14,8 +19,8 @@ variable "eks_cluster_name" {
 }
 
 variable "eks_managed_node_groups" {
-  description = "EKS managed node groups configuration"
-  type        = map(object({
+  description      = "EKS managed node groups configuration"
+  type             = map(object({
     ami_type       = string
     instance_types = list(string)
     min_size       = number

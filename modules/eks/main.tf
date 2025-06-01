@@ -21,8 +21,17 @@ module "eks" {
 
   eks_managed_node_groups = var.eks_managed_node_groups
 
-  tags = {
-    Environment = "dev"
-    Terraform   = "true"
+  access_entries = {
+    devops_access_entry_1 = {
+      principal_arn = var.iam_devops_role_arn
+
+      policy_association = {
+        policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
+        access_scope = {
+          namespaces = ["default"]
+          type       = "namespace"
+        }
+      }
+    }
   }
 }
