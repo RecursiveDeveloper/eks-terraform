@@ -28,7 +28,8 @@ module "vpc" {
 module "eks" {
   source = "./modules/eks"
 
-  iam_devops_role_arn     = module.iam.iam_devops_role_arn
+  devops_user1_arn        = module.iam.devops_user1_arn
+  devops_user2_arn        = module.iam.devops_user2_arn
   vpc_id                  = module.vpc.vpc_id
   vpc_private_subnets     = module.vpc.vpc_private_subnet_ids
   eks_cluster_name        = var.eks_cluster_name

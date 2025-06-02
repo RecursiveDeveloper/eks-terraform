@@ -23,15 +23,28 @@ module "eks" {
 
   access_entries = {
     devops_access_entry_1 = {
-      principal_arn = var.iam_devops_role_arn
-
-      policy_association = {
-        policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
-        access_scope = {
-          namespaces = ["default"]
-          type       = "namespace"
-        }
-      }
+      principal_arn = var.devops_user1_arn
+    },
+    devops_access_entry_2 = {
+      principal_arn = var.devops_user2_arn
     }
+  }
+}
+
+resource "aws_eks_access_policy_association" "devops_user1_policy_association" {
+  cluster_name  = module.eks.cluster_name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = var.devops_user1_arn
+  access_scope {
+    type = "cluster"
+  }
+}
+
+resource "aws_eks_access_policy_association" "devops_user2_policy_association" {
+  cluster_name  = module.eks.cluster_name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = var.devops_user2_arn
+  access_scope {
+    type = "cluster"
   }
 }

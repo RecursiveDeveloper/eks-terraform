@@ -1,5 +1,10 @@
-variable "iam_devops_role_arn" {
-  description = "ARN of the IAM DevOps role"
+variable "devops_user1_arn" {
+  description = "ARN of the IAM DevOps user 1"
+  type        = string
+}
+
+variable "devops_user2_arn" {
+  description = "ARN of the IAM DevOps user 2"
   type        = string
 }
 
