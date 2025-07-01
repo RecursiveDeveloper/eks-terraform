@@ -1,6 +1,7 @@
 name: "Workflow to deploy an EKS cluster into AWS"
 
 on:
+    workflow_dispatch:
     push:
         branches:
             - main
