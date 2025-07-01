@@ -13,11 +13,13 @@ jobs:
   call-deploy-workflow:
     if: ${{ vars.DEPLOY == 'true' }}
     uses: ./.github/workflows/deploy.yml
+    secrets: inherit
     with:
       terraform_version: ${{ vars.TERRAFORM_VERSION }}
       
   call-destroy-workflow:
     if: ${{ vars.DEPLOY == 'false' }}
     uses: ./.github/workflows/destroy.yml
+    secrets: inherit
     with:
       terraform_version: ${{ vars.TERRAFORM_VERSION }}
