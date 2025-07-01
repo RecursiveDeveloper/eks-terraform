@@ -1,0 +1,21 @@
+name: "Workflow to deploy an EKS cluster into AWS"
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    call-deploy-workflow:
+        if: ${{ vars.DEPLOY == 'true' }}
+        uses: ./.github/workflows/deploy.yml
+        with:
+            terraform_version: ${{ vars.TERRAFORM_VERSION }}
+    call-destroy-workflow:
+        if: ${{ vars.DEPLOY == 'false' }}
+        uses: ./.github/workflows/destroy.yml
+        with:
+            terraform_version: ${{ vars.TERRAFORM_VERSION }}
