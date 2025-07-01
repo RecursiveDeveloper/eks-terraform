@@ -16,6 +16,10 @@ jobs:
 
       - name: setup environment
         uses: ./.github/actions/setup-composite
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          aws-access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2.0.3
