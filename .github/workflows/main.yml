@@ -18,17 +18,23 @@ on:
   #   branches:
   #     - main
 
+env:
+  TERRAFORM_VERSION: '1.12.2'
+  AWS_REGION: 'us-east-1'
+
 jobs:
   call-deploy-workflow:
     if: ${{ github.event.inputs.action == 'deploy' }}
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
-      terraform_version: ${{ vars.TERRAFORM_VERSION }}
-      
+      terraform_version: ${{ github.env.TERRAFORM_VERSION }}
+      aws_region: ${{ github.env.AWS_REGION }}
+
   call-destroy-workflow:
     if: ${{ github.event.inputs.action == 'destroy' }}
     uses: ./.github/workflows/destroy.yml
     secrets: inherit
     with:
-      terraform_version: ${{ vars.TERRAFORM_VERSION }}
+      terraform_version: ${{ github.env.TERRAFORM_VERSION }}
+      aws_region: ${{ github.env.AWS_REGION }}

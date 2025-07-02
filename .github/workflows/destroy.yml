@@ -6,6 +6,9 @@ on:
       terraform_version:
         required: true
         type: string
+      aws_region:
+        required: true
+        type: string
 
 jobs:
   deploy:
@@ -17,7 +20,7 @@ jobs:
       - name: setup environment
         uses: ./.github/actions/setup-composite
         with:
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: ${{ inputs.aws_region }}
           aws-access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           
