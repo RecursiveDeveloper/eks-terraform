@@ -3,6 +3,10 @@ name: "Workflow to deploy an EKS cluster into AWS"
 on:
   workflow_dispatch:
   push:
+    paths-ignore:
+      - '.github/**'
+      - '.gitignore'
+      - 'README.md'
     branches:
       - main
   pull_request:
