@@ -4,7 +4,7 @@ vpc_azs               = ["us-east-1a", "us-east-1b", "us-east-1c"]
 vpc_private_subnets   = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
 vpc_public_subnets    = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
 
-ecr_repository_name   = "devopslab-ecr-repo"
+ecr_repository_name   = "devopslab-ecr"
 
 eks_cluster_name       = "devopslab-eks"
 eks_managed_node_groups = {
