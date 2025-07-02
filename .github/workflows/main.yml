@@ -23,18 +23,32 @@ env:
   AWS_REGION: 'us-east-1'
 
 jobs:
+  setup-env-variables:
+    runs-on: ubuntu-latest
+    outputs:
+      TERRAFORM_VERSION: ${{ steps.set-env.outputs.TERRAFORM_VERSION }}
+      AWS_REGION: ${{ steps.set-env.outputs.AWS_REGION }}
+    steps:
+      - name: Set environment variables
+        id: set-env
+        run: |
+          echo "TERRAFORM_VERSION=${{ env.TERRAFORM_VERSION }}" >> $GITHUB_OUTPUT
+          echo "AWS_REGION=${{ env.AWS_REGION }}" >> $GITHUB_OUTPUT
+
   call-deploy-workflow:
     if: ${{ github.event.inputs.action == 'deploy' }}
     uses: ./.github/workflows/deploy.yml
+    needs: setup-env-variables
     secrets: inherit
     with:
-      terraform_version: ${{ github.env.TERRAFORM_VERSION }}
-      aws_region: ${{ github.env.AWS_REGION }}
+      terraform_version: ${{ needs.setup-env-variables.outputs.TERRAFORM_VERSION }}
+      aws_region: ${{ needs.setup-env-variables.outputs.AWS_REGION }}
 
   call-destroy-workflow:
     if: ${{ github.event.inputs.action == 'destroy' }}
     uses: ./.github/workflows/destroy.yml
+    needs: setup-env-variables
     secrets: inherit
     with:
-      terraform_version: ${{ github.env.TERRAFORM_VERSION }}
-      aws_region: ${{ github.env.AWS_REGION }}
+      terraform_version: ${{ needs.setup-env-variables.outputs.TERRAFORM_VERSION }}
+      aws_region: ${{ needs.setup-env-variables.outputs.AWS_REGION }}
