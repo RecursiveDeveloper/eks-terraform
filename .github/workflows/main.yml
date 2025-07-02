@@ -3,10 +3,9 @@ name: "Workflow to deploy an EKS cluster into AWS"
 on:
   workflow_dispatch:
     inputs:
-      deploy:
+      action:
         description: 'What action would you like to do?'
         required: true
-        default: 'deploy'
         type: choice
         options:
           - 'deploy'
@@ -21,14 +20,14 @@ on:
 
 jobs:
   call-deploy-workflow:
-    if: ${{ github.event.inputs.deploy == 'deploy' }}
+    if: ${{ github.event.inputs.action == 'deploy' }}
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
       terraform_version: ${{ vars.TERRAFORM_VERSION }}
       
   call-destroy-workflow:
-    if: ${{ github.event.inputs.deploy == 'destroy' }}
+    if: ${{ github.event.inputs.action == 'destroy' }}
     uses: ./.github/workflows/destroy.yml
     secrets: inherit
     with:
