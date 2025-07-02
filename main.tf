@@ -11,7 +11,8 @@
 module "ecr" {
   source = "./modules/ecr"
 
-  ecr_repository_name = var.ecr_repository_name
+  ecr_backend_repo_name = var.ecr_backend_repo_name
+  ecr_frontend_repo_name = var.ecr_frontend_repo_name
 }
 
 # module "iam" {
