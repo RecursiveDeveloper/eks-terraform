@@ -1,20 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "5.90.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = var.aws_region
-}
-
-module "iam" {
-  source = "./modules/iam"
-}
-
 module "vpc" {
   source = "./modules/vpc"
 
@@ -23,6 +6,16 @@ module "vpc" {
   vpc_azs             = var.vpc_azs
   vpc_private_subnets = var.vpc_private_subnets
   vpc_public_subnets  = var.vpc_public_subnets
+}
+
+module "ecr" {
+  source = "./modules/ecr"
+
+  ecr_repository_name = var.ecr_repository_name
+}
+
+module "iam" {
+  source = "./modules/iam"
 }
 
 module "eks" {
