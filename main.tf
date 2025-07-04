@@ -8,12 +8,12 @@ module "vpc" {
   vpc_public_subnets  = var.vpc_public_subnets
 }
 
-module "ecr" {
-  source = "./modules/ecr"
+# module "ecr" {
+#   source = "./modules/ecr"
 
-  ecr_backend_repo_name = var.ecr_backend_repo_name
-  ecr_frontend_repo_name = var.ecr_frontend_repo_name
-}
+#   ecr_backend_repo_name = var.ecr_backend_repo_name
+#   ecr_frontend_repo_name = var.ecr_frontend_repo_name
+# }
 
 module "iam" {
   source = "./modules/iam"
@@ -25,6 +25,7 @@ module "eks" {
   devops_user1_arn        = module.iam.devops_user1_arn
   devops_user2_arn        = module.iam.devops_user2_arn
   vpc_id                  = module.vpc.vpc_id
+  vpc_public_subnets      = module.vpc.vpc_public_subnet_ids
   vpc_private_subnets     = module.vpc.vpc_private_subnet_ids
   eks_cluster_name        = var.eks_cluster_name
   eks_managed_node_groups = var.eks_managed_node_groups

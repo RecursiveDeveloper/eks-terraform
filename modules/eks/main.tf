@@ -17,6 +17,7 @@ module "eks" {
   authentication_mode = "API"
 
   vpc_id                   = var.vpc_id
+  control_plane_subnet_ids = var.vpc_public_subnets
   subnet_ids               = var.vpc_private_subnets
 
   eks_managed_node_groups = var.eks_managed_node_groups
