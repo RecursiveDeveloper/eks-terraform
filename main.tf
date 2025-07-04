@@ -8,12 +8,12 @@ module "vpc" {
   vpc_public_subnets  = var.vpc_public_subnets
 }
 
-# module "ecr" {
-#   source = "./modules/ecr"
+module "ecr" {
+  source = "./modules/ecr"
 
-#   ecr_backend_repo_name = var.ecr_backend_repo_name
-#   ecr_frontend_repo_name = var.ecr_frontend_repo_name
-# }
+  ecr_backend_repo_name = var.ecr_backend_repo_name
+  ecr_frontend_repo_name = var.ecr_frontend_repo_name
+}
 
 module "iam" {
   source = "./modules/iam"
