@@ -63,53 +63,6 @@ eks-terraform/
 
 ## Connecting to the EKS Cluster
 
-### As `devops_user1` (Assuming `devops_role`)
-
-If you are using IAM users and roles as provisioned in this project, and EKS Access Entries for authentication, follow these steps to connect to the EKS cluster as `devops_user1` by assuming the `devops_role`:
-
-1. **Configure AWS CLI for `devops_user1`:**
-   ```sh
-   aws configure --profile devops_user1
-   ```
-   Enter the access key and secret for `devops_user1`.
-
-2. **Assume the `devops_role`:**
-   ```sh
-   aws sts assume-role \
-     --role-arn arn:aws:iam::<ACCOUNT_ID>:role/devops_role \
-     --role-session-name devops-session \
-     --profile devops_user1
-   ```
-   Replace `<ACCOUNT_ID>` with your AWS account ID.  
-   Save the `AccessKeyId`, `SecretAccessKey`, and `SessionToken` from the output.
-
-3. **Export the temporary credentials:**
-   ```sh
-   set AWS_ACCESS_KEY_ID=<AccessKeyId>
-   set AWS_SECRET_ACCESS_KEY=<SecretAccessKey>
-   set AWS_SESSION_TOKEN=<SessionToken>
-   ```
-   *(Use `export` instead of `set` if on Linux/macOS)*
-
-4. **Update kubeconfig for the EKS cluster:**
-   ```sh
-   aws eks update-kubeconfig \
-     --region <region> \
-     --name <cluster-name>
-   ```
-   Replace `<region>` and `<cluster-name>` with your values.
-
-5. **Use kubectl to access the cluster:**
-   ```sh
-   kubectl get nodes
-   kubectl get pods -A
-   ```
-
-**Note:**  
-This process ensures you are authenticated as `devops_user1` with the permissions of `devops_role` and recognized by EKS via Access Entries.
-
----
-
 ### As the IAM User Used to Deploy Terraform Resources
 
 If you deployed the EKS cluster using an IAM user (for example, your personal or CI/CD user), and this user has administrative or sufficient EKS permissions, you can connect to the cluster directly:
