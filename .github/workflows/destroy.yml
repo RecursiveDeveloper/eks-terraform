@@ -38,5 +38,21 @@ jobs:
       - name: Terraform Plan for Destroy
         run: terraform plan -destroy
 
+      - name: empty ecr images
+        run: |
+          repos=$(aws ecr describe-repositories \
+            --region ${{ inputs.aws_region }} \
+            --query "repositories[?starts_with(repositoryName, \`devopslab-\`)].repositoryName" \
+            --output text 2>/dev/null || true)
+          
+          if [ -n "$repos" ]; then
+            echo "$repos" | xargs -I {} -P 10 bash -c '
+              repo_name="{}"
+              images=$(aws ecr list-images --repository-name "$repo_name" --query "imageIds[*].imageDigest" --output text 2>/dev/null || true)
+              if [ -n "$images" ]; then
+                echo "$images" | xargs -I %% aws ecr batch-delete-image --repository-name "$repo_name" --image-ids imageDigest=%% || true
+              fi
+            '
+          fi
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
