@@ -24,35 +24,36 @@ jobs:
           aws-access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2.0.3
-        with:
-          terraform_version: ${{ inputs.terraform_version }}
+      # - name: Set up Terraform
+      #   uses: hashicorp/setup-terraform@v2.0.3
+      #   with:
+      #     terraform_version: ${{ inputs.terraform_version }}
     
-      - name: Terraform Init
-        run: terraform init
+      # - name: Terraform Init
+      #   run: terraform init
       
-      - name: Terraform Validate
-        run: terraform validate
+      # - name: Terraform Validate
+      #   run: terraform validate
 
-      - name: Terraform Plan for Destroy
-        run: terraform plan -destroy
+      # - name: Terraform Plan for Destroy
+      #   run: terraform plan -destroy
 
-      - name: empty ecr images
+      - name: Empty ecr images
         run: |
-          repos=$(aws ecr describe-repositories \
+          aws ecr describe-repositories \
             --region ${{ inputs.aws_region }} \
             --query "repositories[?starts_with(repositoryName, \`devopslab-\`)].repositoryName" \
-            --output text 2>/dev/null || true)
-          
-          if [ -n "$repos" ]; then
-            echo "$repos" | xargs -I {} -P 10 bash -c '
-              repo_name="{}"
-              images=$(aws ecr list-images --repository-name "$repo_name" --query "imageIds[*].imageDigest" --output text 2>/dev/null || true)
-              if [ -n "$images" ]; then
-                echo "$images" | xargs -I %% aws ecr batch-delete-image --repository-name "$repo_name" --image-ids imageDigest=%% || true
-              fi
-            '
-          fi
-      - name: Terraform Destroy
-        run: terraform destroy -auto-approve
+            --output text 2>/dev/null | tr '\t' '\n' | while read -r repo; do
+            if [ -n "$repo" ]; then
+              echo "Deleting images from repository: $repo"
+              aws ecr list-images --repository-name "$repo" \
+                --query "imageIds[*]" --output json 2>/dev/null | \
+                jq -r '.[] | @base64' | while read -r img; do
+                  echo "$img" | base64 -d | jq -r '{imageDigest,imageTag}' | \
+                    aws ecr batch-delete-image --repository-name "$repo" \
+                    --image-ids file:///dev/stdin || true
+                done
+            fi
+          done
+      # - name: Terraform Destroy
+      #   run: terraform destroy -auto-approve
