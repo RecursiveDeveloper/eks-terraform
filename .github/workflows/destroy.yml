@@ -40,19 +40,11 @@ jobs:
 
       - name: Empty ecr images
         run: |
-          aws ecr describe-repositories \
-            --region ${{ inputs.aws_region }} \
-            --query "repositories[?starts_with(repositoryName, \`devopslab-\`)].repositoryName" \
-            --output text 2>/dev/null | tr '\t' '\n' | while read -r repo; do
-            if [ -n "$repo" ]; then
-              echo "Deleting images from repository: $repo"
-              aws ecr list-images --repository-name "$repo" \
-                --query "imageIds[*]" --output json 2>/dev/null | \
-                jq -r '.[] | @base64' | while read -r img; do
-                  echo "$img" | base64 -d | jq -r '{imageDigest,imageTag}' | \
-                    aws ecr batch-delete-image --repository-name "$repo" \
-                    --image-ids file:///dev/stdin || true
-                done
+          for repo in $(aws ecr describe-repositories --region ${{ inputs.aws_region }} --query "repositories[?starts_with(repositoryName, \`devopslab-\`)].repositoryName" --output text); do
+            echo "Deleting images from repository: $repo"
+            image_ids=$(aws ecr list-images --repository-name "$repo" --query "imageIds" --output json 2>/dev/null)
+            if [ "$image_ids" != "[]" ] && [ "$image_ids" != "null" ]; then
+              aws ecr batch-delete-image --repository-name "$repo" --image-ids "$image_ids" || true
             fi
           done
       # - name: Terraform Destroy
