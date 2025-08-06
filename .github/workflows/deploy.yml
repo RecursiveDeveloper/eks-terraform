@@ -60,16 +60,6 @@ jobs:
 
       - name: Configure aws load balancer controller
         run: |
-          eksctl utils associate-iam-oidc-provider \
-            --region us-east-1 \
-            --cluster devopslab-eks \
-            --approve
-            
-          curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.2.1/docs/install/iam_policy.json
-          aws iam create-policy \
-            --policy-name AWSLoadBalancerControllerIAMPolicy \
-            --policy-document file://iam-policy.json || echo "Policy already exists"
-
           eksctl create iamserviceaccount \
             --cluster=devopslab-eks \
             --namespace=kube-system \
