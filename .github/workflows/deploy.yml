@@ -70,8 +70,7 @@ jobs:
               --cluster=devopslab-eks \
               --namespace=kube-system \
               --name=aws-load-balancer-controller \
-              --region us-east-1 \
-              --force
+              --region us-east-1
           else
             eksctl create iamserviceaccount \
               --cluster=devopslab-eks \
