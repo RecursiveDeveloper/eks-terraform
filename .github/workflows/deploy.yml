@@ -60,6 +60,12 @@ jobs:
 
       - name: Configure aws load balancer controller
         run: |
+          curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.13.3/docs/install/iam_policy.json
+          aws iam create-policy \
+            --policy-name AWSLoadBalancerControllerIAMPolicy \
+            --policy-document file://iam_policy.json 2>/dev/null || echo "Policy already exists"
+          
+          echo "Creating IAM service account..."
           eksctl create iamserviceaccount \
             --cluster=devopslab-eks \
             --namespace=kube-system \
@@ -67,4 +73,4 @@ jobs:
             --attach-policy-arn=arn:aws:iam::819458181218:policy/AWSLoadBalancerControllerIAMPolicy \
             --override-existing-serviceaccounts \
             --region us-east-1 \
-            --approve
+            --approve || echo "Service account creation failed or already exists"
