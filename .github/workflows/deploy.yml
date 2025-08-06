@@ -74,6 +74,9 @@ jobs:
             --region us-east-1 \
             --approve
 
+          wget https://raw.githubusercontent.com/aws/eks-charts/master/stable/aws-load-balancer-controller/crds/crds.yaml
+          kubectl apply -f crds.yaml
+          
           helm repo add eks https://aws.github.io/eks-charts
           helm repo update eks
           helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
