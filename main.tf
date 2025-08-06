@@ -31,9 +31,10 @@ module "eks" {
   eks_managed_node_groups = var.eks_managed_node_groups
 }
 
-module "alb_controller" {
-  source  = "campaand/alb-ingress-controller/aws"
-  version = "~> 2.0"
+module "load_balancer_controller" {
+  source = "git::https://github.com/DNXLabs/terraform-aws-eks-lb-controller.git"
 
-  cluster_name = var.eks_cluster_name
+  cluster_identity_oidc_issuer     = module.eks.cluster_oidc_issuer_url
+  cluster_identity_oidc_issuer_arn = module.eks.cluster_oidc_provider_arn
+  cluster_name                     = var.eks_cluster_name
 }
