@@ -73,4 +73,10 @@ jobs:
             --attach-policy-arn=arn:aws:iam::819458181218:policy/AWSLoadBalancerControllerIAMPolicy \
             --override-existing-serviceaccounts \
             --region us-east-1 \
-            --approve || echo "Service account creation failed or already exists"
+            --approve
+          
+          echo "Verifying service account creation..."
+          kubectl get serviceaccount aws-load-balancer-controller -n kube-system || {
+            echo "Service account not found, creating manually..."
+            kubectl create serviceaccount aws-load-balancer-controller -n kube-system
+          }
