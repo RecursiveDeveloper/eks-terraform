@@ -60,10 +60,15 @@ jobs:
 
       - name: Configure aws load balancer controller
         run: |
-          curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.13.3/docs/install/iam_policy.json
+          eksctl utils associate-iam-oidc-provider \
+            --region us-east-1 \
+            --cluster devopslab-eks \
+            --approve
+            
+          curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.2.1/docs/install/iam_policy.json
           aws iam create-policy \
             --policy-name AWSLoadBalancerControllerIAMPolicy \
-            --policy-document file://iam_policy.json || echo "Policy already exists"
+            --policy-document file://iam-policy.json || echo "Policy already exists"
 
           eksctl create iamserviceaccount \
             --cluster=devopslab-eks \
@@ -71,17 +76,15 @@ jobs:
             --name=aws-load-balancer-controller \
             --attach-policy-arn=arn:aws:iam::819458181218:policy/AWSLoadBalancerControllerIAMPolicy \
             --override-existing-serviceaccounts \
-            --region us-east-1 \
             --approve
 
-          wget https://raw.githubusercontent.com/aws/eks-charts/master/stable/aws-load-balancer-controller/crds/crds.yaml
-          kubectl apply -f crds.yaml
-          
           helm repo add eks https://aws.github.io/eks-charts
-          helm repo update eks
+          kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
           helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
             -n kube-system \
             --set clusterName=devopslab-eks \
             --set serviceAccount.create=false \
-            --set serviceAccount.name=aws-load-balancer-controller \
-            --version 1.13.0
+            --set serviceAccount.name=aws-load-balancer-controller
+          
+          wget https://raw.githubusercontent.com/aws/eks-charts/master/stable/aws-load-balancer-controller/crds/crds.yaml
+          kubectl apply -f crds.yaml
