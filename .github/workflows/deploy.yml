@@ -65,13 +65,6 @@ jobs:
             --policy-name AWSLoadBalancerControllerIAMPolicy \
             --policy-document file://iam_policy.json 2>/dev/null || echo "Policy already exists"
 
-          if eksctl get iamserviceaccount --cluster devopslab-eks --namespace kube-system | grep -q aws-load-balancer-controller; then
-            eksctl delete iamserviceaccount \
-              --cluster=devopslab-eks \
-              --namespace=kube-system \
-              --name=aws-load-balancer-controller \
-              --region us-east-1
-          fi
           eksctl create iamserviceaccount \
             --cluster=devopslab-eks \
             --namespace=kube-system \
