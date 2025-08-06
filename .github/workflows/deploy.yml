@@ -65,27 +65,37 @@ jobs:
             --policy-name AWSLoadBalancerControllerIAMPolicy \
             --policy-document file://iam_policy.json 2>/dev/null || echo "Policy already exists"
 
-          eksctl create iamserviceaccount \
-            --cluster=devopslab-eks \
-            --namespace=kube-system \
-            --name=aws-load-balancer-controller \
-            --attach-policy-arn=arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):policy/AWSLoadBalancerControllerIAMPolicy \
-            --override-existing-serviceaccounts \
-            --region us-east-1 \
-            --approve
-          
-          # if ! helm list -n kube-system | grep -q aws-load-balancer-controller; then
-          #   helm repo add eks https://aws.github.io/eks-charts
-          #   helm repo update
-          #   helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
-          #     -n kube-system \
-          #     --set clusterName=devopslab-eks \
-          #     --set serviceAccount.create=false \
-          #     --set serviceAccount.name=aws-load-balancer-controller \
-          #     --set region=us-east-1 \
-          #     --set vpcId=$(aws eks describe-cluster --name devopslab-eks --region us-east-1 --query "cluster.resourcesVpcConfig.vpcId" --output text) \
-          #     --set image.tag="v2.13.3"
-          # fi
+          //check if eksctl iamserviceaccount already exists
+          if eksctl get iamserviceaccount --cluster devopslab-eks --namespace kube-system | grep -q aws-load-balancer-controller; then
+            eksctl delete iamserviceaccount \
+              --cluster=devopslab-eks \
+              --namespace=kube-system \
+              --name=aws-load-balancer-controller \
+              --region us-east-1 \
+              --force
+          else
+            eksctl create iamserviceaccount \
+              --cluster=devopslab-eks \
+              --namespace=kube-system \
+              --name=aws-load-balancer-controller \
+              --attach-policy-arn=arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):policy/AWSLoadBalancerControllerIAMPolicy \
+              --override-existing-serviceaccounts \
+              --region us-east-1 \
+              --approve
+          fi
 
-          # # Wait for the deployment to be ready
-          # kubectl rollout status deployment/aws-load-balancer-controller -n kube-system --timeout=180s
+          if ! helm list -n kube-system | grep -q aws-load-balancer-controller; then
+            helm repo add eks https://aws.github.io/eks-charts
+            helm repo update
+            helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+              -n kube-system \
+              --set clusterName=devopslab-eks \
+              --set serviceAccount.create=false \
+              --set serviceAccount.name=aws-load-balancer-controller \
+              --set region=us-east-1 \
+              --set vpcId=$(aws eks describe-cluster --name devopslab-eks --region us-east-1 --query "cluster.resourcesVpcConfig.vpcId" --output text) \
+              --set image.tag="v2.13.3"
+          fi
+
+          # Wait for the deployment to be ready
+          kubectl rollout status deployment/aws-load-balancer-controller -n kube-system --timeout=180s
