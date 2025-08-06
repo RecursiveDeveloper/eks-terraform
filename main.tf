@@ -30,3 +30,10 @@ module "eks" {
   eks_cluster_name        = var.eks_cluster_name
   eks_managed_node_groups = var.eks_managed_node_groups
 }
+
+module "alb_controller" {
+  source  = "campaand/alb-ingress-controller/aws"
+  version = "~> 2.0"
+
+  cluster_name = var.eks_cluster_name
+}
