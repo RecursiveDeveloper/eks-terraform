@@ -32,7 +32,8 @@ module "eks" {
 }
 
 module "load_balancer_controller" {
-  source = "git::https://github.com/DNXLabs/terraform-aws-eks-lb-controller.git"
+  source  = "DNXLabs/eks-lb-controller/aws"
+  version = "0.11.0"
 
   cluster_identity_oidc_issuer     = module.eks.cluster_oidc_issuer_url
   cluster_identity_oidc_issuer_arn = module.eks.cluster_oidc_provider_arn
