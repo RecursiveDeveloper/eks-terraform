@@ -30,12 +30,3 @@ module "eks" {
   eks_cluster_name        = var.eks_cluster_name
   eks_managed_node_groups = var.eks_managed_node_groups
 }
-
-module "load_balancer_controller" {
-  source  = "DNXLabs/eks-lb-controller/aws"
-  version = "0.11.0"
-
-  cluster_identity_oidc_issuer     = module.eks.cluster_oidc_issuer_url
-  cluster_identity_oidc_issuer_arn = module.eks.cluster_oidc_provider_arn
-  cluster_name                     = var.eks_cluster_name
-}
