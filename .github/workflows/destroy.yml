@@ -47,6 +47,18 @@ jobs:
               aws ecr batch-delete-image --repository-name "$repo" --image-ids "$image_ids" || true
             fi
           done
-
+          
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name devopslab-eks \
+            --region us-east-1
+  
+      - name: Delete aws-load-balancer-controller
+        run: |
+          if helm list -n kube-system | grep -q aws-load-balancer-controller; then
+              helm uninstall aws-load-balancer-controller -n kube-system
+          fi
+      
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
