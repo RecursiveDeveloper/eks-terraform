@@ -23,6 +23,18 @@ module "eks" {
 
   eks_managed_node_groups = var.eks_managed_node_groups
 
+  # EBS CSI Driver IAM role
+  node_security_group_additional_rules = {
+    ingress_self_all = {
+      description = "Node to node all ports/protocols"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "ingress"
+      self        = true
+    }
+  }
+
   access_entries = {
     devops_access_entry_1 = {
       principal_arn = var.devops_user1_arn
@@ -31,6 +43,12 @@ module "eks" {
       principal_arn = var.devops_user2_arn
     }
   }
+}
+
+# Attach EBS CSI policy to node group role
+resource "aws_iam_role_policy_attachment" "ebs_csi_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/Amazon_EBS_CSI_DriverPolicy"
+  role       = module.eks.eks_managed_node_groups["devopslab-node-group"].iam_role_name
 }
 
 resource "aws_eks_access_policy_association" "devops_user1_policy_association" {
