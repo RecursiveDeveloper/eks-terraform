@@ -58,8 +58,7 @@ jobs:
               --cluster=${{ inputs.eks_cluster_name }} \
               --namespace=kube-system \
               --name=aws-load-balancer-controller \
-              --region ${{ inputs.aws_region }} \
-              --approve
+              --region ${{ inputs.aws_region }}
           else
             eksctl create iamserviceaccount \
               --cluster=${{ inputs.eks_cluster_name }} \
