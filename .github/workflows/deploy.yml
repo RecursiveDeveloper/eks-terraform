@@ -53,14 +53,25 @@ jobs:
             --policy-name AWSLoadBalancerControllerIAMPolicy \
             --policy-document file://iam_policy.json 2>/dev/null || echo "Policy already exists"
 
-          eksctl create iamserviceaccount \
-            --cluster=${{ inputs.eks_cluster_name }} \
-            --namespace=kube-system \
-            --name=aws-load-balancer-controller \
-            --attach-policy-arn=arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):policy/AWSLoadBalancerControllerIAMPolicy \
-            --override-existing-serviceaccounts \
-            --region ${{ inputs.aws_region }} \
-            --approve
+          if eksctl get iamserviceaccount --cluster ${{ inputs.eks_cluster_name }} --namespace kube-system | grep -q aws-load-balancer-controller; then
+            eksctl update iamserviceaccount \
+              --cluster=${{ inputs.eks_cluster_name }} \
+              --namespace=kube-system \
+              --name=aws-load-balancer-controller \
+              --attach-policy-arn=arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):policy/AWSLoadBalancerControllerIAMPolicy \
+              --override-existing-serviceaccounts \
+              --region ${{ inputs.aws_region }} \
+              --approve
+          else
+            eksctl create iamserviceaccount \
+              --cluster=${{ inputs.eks_cluster_name }} \
+              --namespace=kube-system \
+              --name=aws-load-balancer-controller \
+              --attach-policy-arn=arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):policy/AWSLoadBalancerControllerIAMPolicy \
+              --override-existing-serviceaccounts \
+              --region ${{ inputs.aws_region }} \
+              --approve
+          fi
 
           if helm list -n kube-system | grep -q aws-load-balancer-controller; then
             wget https://raw.githubusercontent.com/aws/eks-charts/master/stable/aws-load-balancer-controller/crds/crds.yaml
