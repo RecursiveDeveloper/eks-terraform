@@ -9,6 +9,9 @@ on:
       aws_region:
         required: true
         type: string
+      eks_cluster_name:
+        required: true
+        type: string
 
 jobs:
   deploy:
@@ -23,12 +26,8 @@ jobs:
           aws-region: ${{ inputs.aws_region }}
           aws-access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2.0.3
-        with:
           terraform_version: ${{ inputs.terraform_version }}
-    
+
       - name: Terraform Init
         run: terraform init
       
@@ -41,22 +40,11 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
       
-      - name: install eksctl
-        run: |
-          # for ARM systems, set ARCH to: `arm64`, `armv6` or `armv7`
-          ARCH=amd64
-          PLATFORM=$(uname -s)_$ARCH
-          curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
-          # (Optional) Verify checksum
-          curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
-          tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
-          sudo install -m 0755 /tmp/eksctl /usr/local/bin && rm /tmp/eksctl
-      
       - name: Update kubeconfig
         run: |
           aws eks update-kubeconfig \
-            --name devopslab-eks \
-            --region us-east-1
+            --name ${{ inputs.eks_cluster_name }} \
+            --region ${{ inputs.aws_region }}
 
       - name: Configure aws load balancer controller
         run: |
@@ -66,24 +54,34 @@ jobs:
             --policy-document file://iam_policy.json 2>/dev/null || echo "Policy already exists"
 
           eksctl create iamserviceaccount \
-            --cluster=devopslab-eks \
+            --cluster=${{ inputs.eks_cluster_name }} \
             --namespace=kube-system \
             --name=aws-load-balancer-controller \
             --attach-policy-arn=arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):policy/AWSLoadBalancerControllerIAMPolicy \
             --override-existing-serviceaccounts \
-            --region us-east-1 \
+            --region ${{ inputs.aws_region }} \
             --approve
 
           if helm list -n kube-system | grep -q aws-load-balancer-controller; then
-            helm uninstall aws-load-balancer-controller -n kube-system
+            wget https://raw.githubusercontent.com/aws/eks-charts/master/stable/aws-load-balancer-controller/crds/crds.yaml
+            kubectl apply -f crds.yaml
+            helm upgrade aws-load-balancer-controller eks/aws-load-balancer-controller \
+              -n kube-system \
+              --set clusterName=${{ inputs.eks_cluster_name }} \
+              --set serviceAccount.create=false \
+              --set serviceAccount.name=aws-load-balancer-controller \
+              --set region=${{ inputs.aws_region }} \
+              --set vpcId=$(aws eks describe-cluster --name ${{ inputs.eks_cluster_name }} --region ${{ inputs.aws_region }} --query "cluster.resourcesVpcConfig.vpcId" --output text) \
+              --set image.tag="v2.13.3"
+          else
+            helm repo add eks https://aws.github.io/eks-charts
+            helm repo update
+            helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+              -n kube-system \
+              --set clusterName=${{ inputs.eks_cluster_name }} \
+              --set serviceAccount.create=false \
+              --set serviceAccount.name=aws-load-balancer-controller \
+              --set region=${{ inputs.aws_region }} \
+              --set vpcId=$(aws eks describe-cluster --name ${{ inputs.eks_cluster_name }} --region ${{ inputs.aws_region }} --query "cluster.resourcesVpcConfig.vpcId" --output text) \
+              --set image.tag="v2.13.3"
           fi
-          helm repo add eks https://aws.github.io/eks-charts
-          helm repo update
-          helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
-            -n kube-system \
-            --set clusterName=devopslab-eks \
-            --set serviceAccount.create=false \
-            --set serviceAccount.name=aws-load-balancer-controller \
-            --set region=us-east-1 \
-            --set vpcId=$(aws eks describe-cluster --name devopslab-eks --region us-east-1 --query "cluster.resourcesVpcConfig.vpcId" --output text) \
-            --set image.tag="v2.13.3"

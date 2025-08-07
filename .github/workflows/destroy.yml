@@ -9,6 +9,9 @@ on:
       aws_region:
         required: true
         type: string
+      eks_cluster_name:
+        required: true
+        type: string
 
 jobs:
   deploy:
@@ -23,12 +26,8 @@ jobs:
           aws-region: ${{ inputs.aws_region }}
           aws-access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2.0.3
-        with:
           terraform_version: ${{ inputs.terraform_version }}
-    
+          
       - name: Terraform Init
         run: terraform init
       
@@ -47,17 +46,17 @@ jobs:
               aws ecr batch-delete-image --repository-name "$repo" --image-ids "$image_ids" || true
             fi
           done
-          
+      
       - name: Update kubeconfig
         run: |
           aws eks update-kubeconfig \
-            --name devopslab-eks \
-            --region us-east-1
-  
+            --name ${{ inputs.eks_cluster_name }} \
+            --region ${{ inputs.aws_region }}
+
       - name: Delete aws-load-balancer-controller
         run: |
           if helm list -n kube-system | grep -q aws-load-balancer-controller; then
-              helm uninstall aws-load-balancer-controller -n kube-system
+            helm uninstall aws-load-balancer-controller -n kube-system
           fi
       
       - name: Terraform Destroy

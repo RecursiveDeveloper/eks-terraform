@@ -21,6 +21,7 @@ on:
 env:
   TERRAFORM_VERSION: '1.12.2'
   AWS_REGION: 'us-east-1'
+  EKS_CLUSTER_NAME: "devopslab-eks"
 
 jobs:
   setup-env-variables:
@@ -28,12 +29,14 @@ jobs:
     outputs:
       TERRAFORM_VERSION: ${{ steps.set-env.outputs.TERRAFORM_VERSION }}
       AWS_REGION: ${{ steps.set-env.outputs.AWS_REGION }}
+      EKS_CLUSTER_NAME: ${{ steps.set-env.outputs.EKS_CLUSTER_NAME }}
     steps:
       - name: Set environment variables
         id: set-env
         run: |
           echo "TERRAFORM_VERSION=${{ env.TERRAFORM_VERSION }}" >> $GITHUB_OUTPUT
           echo "AWS_REGION=${{ env.AWS_REGION }}" >> $GITHUB_OUTPUT
+          echo "EKS_CLUSTER_NAME=${{ env.EKS_CLUSTER_NAME }}" >> $GITHUB_OUTPUT
 
   call-deploy-workflow:
     if: ${{ github.event.inputs.action == 'deploy' }}
@@ -43,6 +46,7 @@ jobs:
     with:
       terraform_version: ${{ needs.setup-env-variables.outputs.TERRAFORM_VERSION }}
       aws_region: ${{ needs.setup-env-variables.outputs.AWS_REGION }}
+      eks_cluster_name: ${{ needs.setup-env-variables.outputs.EKS_CLUSTER_NAME }}
 
   call-destroy-workflow:
     if: ${{ github.event.inputs.action == 'destroy' }}
@@ -52,3 +56,4 @@ jobs:
     with:
       terraform_version: ${{ needs.setup-env-variables.outputs.TERRAFORM_VERSION }}
       aws_region: ${{ needs.setup-env-variables.outputs.AWS_REGION }}
+      eks_cluster_name: ${{ needs.setup-env-variables.outputs.EKS_CLUSTER_NAME }}

@@ -10,6 +10,9 @@ inputs:
   aws-secret-key:
     description: 'The AWS secret key'
     required: true
+  terraform_version:
+    description: 'The Terraform version to use'
+    required: true
 
 runs:
   using: 'composite'
@@ -25,7 +28,6 @@ runs:
           rm awscliv2.zip
         else
           echo -e "\nAWS CLI is already installed\n"
-          exit 0
         fi
       shell: bash
 
@@ -35,3 +37,20 @@ runs:
         aws-region: ${{ inputs.aws-region }}
         aws-access-key-id: ${{ inputs.aws-access-key }}
         aws-secret-access-key: ${{ inputs.aws-secret-key }}
+    
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2.0.3
+      with:
+        terraform_version: ${{ inputs.terraform_version }}
+
+    - name: Install eksctl
+      shell: bash
+      run: |
+        # for ARM systems, set ARCH to: `arm64`, `armv6` or `armv7`
+        ARCH=amd64
+        PLATFORM=$(uname -s)_$ARCH
+        curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+        # (Optional) Verify checksum
+        curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
+        tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+        sudo install -m 0755 /tmp/eksctl /usr/local/bin && rm /tmp/eksctl
