@@ -59,16 +59,15 @@ jobs:
               --namespace=kube-system \
               --name=aws-load-balancer-controller \
               --region ${{ inputs.aws_region }}
-          else
-            eksctl create iamserviceaccount \
-              --cluster=${{ inputs.eks_cluster_name }} \
-              --namespace=kube-system \
-              --name=aws-load-balancer-controller \
-              --attach-policy-arn=arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):policy/AWSLoadBalancerControllerIAMPolicy \
-              --override-existing-serviceaccounts \
-              --region ${{ inputs.aws_region }} \
-              --approve
           fi
+          eksctl create iamserviceaccount \
+            --cluster=${{ inputs.eks_cluster_name }} \
+            --namespace=kube-system \
+            --name=aws-load-balancer-controller \
+            --attach-policy-arn=arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):policy/AWSLoadBalancerControllerIAMPolicy \
+            --override-existing-serviceaccounts \
+            --region ${{ inputs.aws_region }} \
+            --approve
 
           helm repo add eks https://aws.github.io/eks-charts
           helm repo update
