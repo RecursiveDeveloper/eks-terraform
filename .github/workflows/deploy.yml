@@ -54,12 +54,10 @@ jobs:
             --policy-document file://iam_policy.json 2>/dev/null || echo "Policy already exists"
 
           if eksctl get iamserviceaccount --cluster ${{ inputs.eks_cluster_name }} --namespace kube-system | grep -q aws-load-balancer-controller; then
-            eksctl update iamserviceaccount \
+            eksctl delete iamserviceaccount \
               --cluster=${{ inputs.eks_cluster_name }} \
               --namespace=kube-system \
               --name=aws-load-balancer-controller \
-              --attach-policy-arn=arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):policy/AWSLoadBalancerControllerIAMPolicy \
-              --override-existing-serviceaccounts \
               --region ${{ inputs.aws_region }} \
               --approve
           else
