@@ -59,5 +59,11 @@ jobs:
             helm uninstall aws-load-balancer-controller -n kube-system
           fi
       
+      - name: Delete aws load balancer
+        run: |
+          aws elbv2 delete-load-balancer \
+            --load-balancer-arn $(aws elbv2 describe-load-balancers \
+            --query "LoadBalancers[?contains(LoadBalancerName, 'shareduniralb')].LoadBalancerArn" --output text)
+
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
