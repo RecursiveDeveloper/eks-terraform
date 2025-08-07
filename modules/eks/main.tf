@@ -10,7 +10,7 @@ module "eks" {
     eks-pod-identity-agent = {}
     kube-proxy             = {}
     vpc-cni                = {}
-    ebs-csi-driver         = {}
+    aws-ebs-csi-driver     = {}
   }
 
   enable_cluster_creator_admin_permissions = true
