@@ -65,14 +65,15 @@ jobs:
       
       - name: Delete aws load balancer
         run: |
-          if ! aws elbv2 describe-load-balancers \
-            --query "LoadBalancers[?contains(LoadBalancerName, 'shareduniralb')].LoadBalancerName" \
-            --output text; then
+          LB_ARN=$(aws elbv2 describe-load-balancers \
+            --query "LoadBalancers[?contains(LoadBalancerName, 'shareduniralb')].LoadBalancerArn" \
+            --output text 2>/dev/null || echo "")
+          
+          if [ -z "$LB_ARN" ] || [ "$LB_ARN" = "None" ]; then
             echo "Load balancer 'shareduniralb' not found, skipping deletion."
           else
-            aws elbv2 delete-load-balancer \
-              --load-balancer-arn $(aws elbv2 describe-load-balancers \
-              --query "LoadBalancers[?contains(LoadBalancerName, 'shareduniralb')].LoadBalancerArn" --output text)
+            echo "Deleting load balancer: $LB_ARN"
+            aws elbv2 delete-load-balancer --load-balancer-arn "$LB_ARN"
           fi
 
       - name: Terraform Destroy
