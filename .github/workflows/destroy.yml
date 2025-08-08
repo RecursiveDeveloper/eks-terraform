@@ -49,9 +49,13 @@ jobs:
       
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig \
-            --name ${{ inputs.eks_cluster_name }} \
-            --region ${{ inputs.aws_region }}
+          if ! aws eks describe-cluster --name ${{ inputs.eks_cluster_name }} --region ${{ inputs.aws_region }}; then
+            echo "Cluster ${{ inputs.eks_cluster_name }} not found, skipping kubeconfig update."
+          else
+            aws eks update-kubeconfig \
+              --name ${{ inputs.eks_cluster_name }} \
+              --region ${{ inputs.aws_region }}
+          fi
 
       - name: Delete aws-load-balancer-controller
         run: |
