@@ -14,6 +14,9 @@ eks-terraform/
 ├── terraform.auto.tfvars
 ├── README.md
 ├── modules/
+│   ├── ecr/
+│   │   ├── main.tf
+│   │   └── variables.tf
 │   ├── eks/
 │   │   ├── main.tf
 │   │   └── variables.tf
@@ -30,15 +33,12 @@ eks-terraform/
 
 - **VPC Module:** Provisions a VPC with public and private subnets across multiple AZs.
 - **IAM Module:** Creates IAM users, groups, and policies for DevOps access.
+- **ECR Module:** Creates container repositories for backend and frontend applications.
 - **EKS Module:** Deploys an EKS cluster with managed node groups.
 
 ## Usage
 
 1. **Clone the repository:**
-   ```sh
-   git clone <your-repo-url>
-   cd eks-terraform
-   ```
 
 2. **Configure your AWS credentials:**
    Ensure your AWS credentials are set in your environment or via the AWS CLI.
@@ -75,10 +75,7 @@ If you deployed the EKS cluster using an IAM user (for example, your personal or
 
 2. **Update kubeconfig for the EKS cluster:**
    ```sh
-   aws eks update-kubeconfig \
-     --region <region> \
-     --name <cluster-name> \
-     --profile <deployer-profile>
+   aws eks update-kubeconfig --region <region> --name <cluster-name> --profile <deployer-profile>
    ```
    Replace `<region>`, `<cluster-name>`, and `<deployer-profile>` with your values.
 
@@ -99,6 +96,7 @@ If you use a different IAM user or role, repeat the process with the appropriate
 
 - [`modules/vpc`](modules/vpc/main.tf): Provisions the VPC and networking resources.
 - [`modules/iam`](modules/iam/main.tf): Manages IAM users, groups, and policies.
+- [`modules/ecr`](modules/ecr/main.tf): Creates ECR repositories for container images.
 - [`modules/eks`](modules/eks/main.tf): Deploys the EKS cluster and node groups.
 
 ## Requirements
