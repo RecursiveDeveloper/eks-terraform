@@ -13,7 +13,7 @@ eks_managed_node_groups = {
     ami_type       = "AL2_x86_64"
     instance_types = ["t3.medium"]
     min_size       = 1
-    max_size       = 3
+    max_size       = 4
     desired_size   = 2
   }
 }
