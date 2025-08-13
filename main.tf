@@ -30,3 +30,8 @@ module "eks" {
   eks_cluster_name        = var.eks_cluster_name
   eks_managed_node_groups = var.eks_managed_node_groups
 }
+
+output "cluster_autoscaler_role_arn" {
+  description = "ARN of the cluster autoscaler IAM role"
+  value       = module.eks.cluster_autoscaler_role_arn
+}

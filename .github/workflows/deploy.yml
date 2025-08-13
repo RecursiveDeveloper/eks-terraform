@@ -83,3 +83,8 @@ jobs:
             --set region=${{ inputs.aws_region }} \
             --set vpcId=$(aws eks describe-cluster --name ${{ inputs.eks_cluster_name }} --region ${{ inputs.aws_region }} --query "cluster.resourcesVpcConfig.vpcId" --output text) \
             --set image.tag="v2.13.3"
+
+      - name: Deploy cluster autoscaler
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          sed "s/ACCOUNT_ID/$ACCOUNT_ID/g" cluster-autoscaler.yaml | kubectl apply -f -

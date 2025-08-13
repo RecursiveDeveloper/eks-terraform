@@ -11,13 +11,9 @@ eks_cluster_name       = "devopslab-eks"
 eks_managed_node_groups = {
   "devopslab-node-group" = {
     ami_type       = "AL2_x86_64"
-    instance_types = ["t3.small"]
+    instance_types = ["t3.medium"]
     min_size       = 1
     max_size       = 3
     desired_size   = 2
-    tags = {
-      "k8s.io/cluster-autoscaler/enabled" = "true"
-      "k8s.io/cluster-autoscaler/devopslab-eks" = "owned"
-    }
   }
 }
