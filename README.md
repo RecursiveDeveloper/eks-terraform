@@ -36,6 +36,45 @@ eks-terraform/
 - **ECR Module:** Creates container repositories for backend and frontend applications.
 - **EKS Module:** Deploys an EKS cluster with managed node groups.
 
+## Prerequisites
+
+Before deploying this Terraform configuration, ensure you have the following prerequisites in place:
+
+### 1. S3 Backend Bucket
+
+Create an S3 bucket named `tfm-unir-backend` in the `us-east-1` region to store the Terraform state file. This bucket is referenced in the [provider.tf](provider.tf) configuration.
+
+```sh
+aws s3 mb s3://tfm-unir-backend --region us-east-1
+```
+
+### 2. Environment Configuration Files
+
+Create the following directory structure and environment files in your S3 bucket:
+
+```
+tfm-unir-backend/
+├── backend/
+│   └── .env.docker
+└── frontend/
+    └── .env.docker
+```
+
+Each `.env.docker` file should contain the necessary environment variables for your backend and frontend applications respectively.
+
+**Example backend/.env.docker:**
+```
+DATABASE_URL=your_database_url
+API_KEY=your_api_key
+ENVIRONMENT=production
+```
+
+**Example frontend/.env.docker:**
+```
+REACT_APP_API_URL=your_api_url
+REACT_APP_ENV=production
+```
+
 ## Usage
 
 1. **Clone the repository:**
