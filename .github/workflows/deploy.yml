@@ -87,6 +87,16 @@ jobs:
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           sed "s/ACCOUNT_ID/$ACCOUNT_ID/g" cluster-autoscaler.yaml | kubectl apply -f -
 
+      - name: Wait for AWS Load Balancer Controller
+        run: |
+          echo "Waiting for AWS Load Balancer Controller to be ready..."
+          kubectl wait --for=condition=available --timeout=300s deployment/aws-load-balancer-controller -n kube-system
+          
+          echo "Waiting for webhook service to be ready..."
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balancer-controller -n kube-system --timeout=300s
+          
+          sleep 30
+
       - name: Install Metrics Server
         run: |
           kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
