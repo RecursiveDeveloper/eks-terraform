@@ -46,6 +46,13 @@ jobs:
             --name ${{ inputs.eks_cluster_name }} \
             --region ${{ inputs.aws_region }}
 
+      - name: Clean up existing load balancer resources
+        run: |
+          kubectl delete validatingwebhookconfiguration aws-load-balancer-webhook --ignore-not-found=true
+          kubectl delete mutatingwebhookconfiguration aws-load-balancer-webhook --ignore-not-found=true
+          helm uninstall aws-load-balancer-controller -n kube-system --ignore-not-found || echo "Controller not found"
+          sleep 10
+
       - name: Configure aws load balancer controller
         run: |
           curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.13.3/docs/install/iam_policy.json
@@ -95,6 +102,10 @@ jobs:
           
           echo "Waiting for webhook service to be ready..."
           kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balancer-controller -n kube-system --timeout=300s
+          
+          echo "Verifying webhook configurations..."
+          kubectl get validatingwebhookconfiguration aws-load-balancer-webhook
+          kubectl get mutatingwebhookconfiguration aws-load-balancer-webhook
           sleep 30
 
       - name: Install Metrics Server
