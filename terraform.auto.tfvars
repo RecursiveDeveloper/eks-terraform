@@ -10,10 +10,11 @@ ecr_frontend_repo_name  = "devopslab-frontend-ecr"
 eks_cluster_name       = "devopslab-eks"
 eks_managed_node_groups = {
   "devopslab-node-group" = {
+    capacity_type  = "ON_DEMAND"
     ami_type       = "AL2_x86_64"
-    instance_types = ["t3.medium"]
-    min_size       = 2
-    max_size       = 5
-    desired_size   = 2
+    instance_types = ["t3.small", "t3.medium"]
+    min_size       = 1
+    max_size       = 4
+    desired_size   = 1
   }
 }
