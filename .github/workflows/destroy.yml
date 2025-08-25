@@ -57,11 +57,18 @@ jobs:
               --region ${{ inputs.aws_region }}
           fi
 
+      - name: Delete all ingress resources from all namespaces
+        run: |
+          kubectl delete ingress --all --all-namespaces || true
+          echo "Waiting for load balancer cleanup..."
+          sleep 30
+
       - name: Delete aws-load-balancer-controller
         run: |
           if helm list -n kube-system | grep -q aws-load-balancer-controller; then
             helm uninstall aws-load-balancer-controller -n kube-system
           fi
+          sleep 15
       
       - name: Delete aws load balancer
         run: |
