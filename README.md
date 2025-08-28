@@ -77,6 +77,8 @@ REACT_APP_ENV=production
 
 ## Usage
 
+### Local Deployment
+
 1. **Clone the repository:**
 
 2. **Configure your AWS credentials:**
@@ -99,6 +101,15 @@ REACT_APP_ENV=production
    ```sh
    terraform apply
    ```
+
+### GitHub Actions Deployment
+
+For automated deployment using GitHub Actions, ensure the following repository secrets are configured:
+
+- `AWS_ACCESS_KEY_ID`: Your AWS access key ID
+- `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key
+
+These secrets will be used by the GitHub Actions workflow to authenticate with AWS and deploy the infrastructure.
 
 ## Connecting to the EKS Cluster
 
