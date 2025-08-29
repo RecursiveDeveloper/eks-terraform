@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "tfm-unir-backend"
+    bucket         = "tfm-unir-backend1"
     key            = "terraform.tfstate"
     region         = "us-east-1"
   }
