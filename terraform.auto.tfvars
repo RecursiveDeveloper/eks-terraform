@@ -13,8 +13,8 @@ eks_managed_node_groups = {
     capacity_type  = "ON_DEMAND"
     ami_type       = "AL2023_x86_64_STANDARD"
     instance_types = ["t3a.medium"]
-    min_size       = 0
+    min_size       = 1
     max_size       = 4
-    desired_size   = 0
+    desired_size   = 1
   }
 }
