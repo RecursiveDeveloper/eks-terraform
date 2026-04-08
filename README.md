@@ -3,7 +3,7 @@
 This project provides a modular Terraform configuration to provision an AWS EKS (Elastic Kubernetes Service) cluster, including VPC networking and IAM resources.
 
 ## Project Architecture
-![image](https://raw.githubusercontent.com/RecursiveDeveloper/static-media-content/refs/heads/main/eks-terraform-architecture.jpg)
+![image](https://raw.githubusercontent.com/RecursiveDeveloper/static-media-content/refs/heads/main/HA_Eks_Terraform-Diagram.jpg)
 
 ## Project Structure
 
